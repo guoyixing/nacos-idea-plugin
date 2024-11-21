@@ -24,6 +24,9 @@
     <!-- Extension points defined by the plugin.
          Read more: https://plugins.jetbrains.com/docs/intellij/plugin-extension-points.html -->
     <extensions defaultExtensionNs="com.intellij">
-        <projectConfigurable groupId="tools" displayName="Nacos" id="nacos.idea.plugin.setting" instance="io.github.guoyixing.nacosideaplugin.ui.setting.SettingFactory" />
+        <projectConfigurable groupId="tools" displayName="Nacos" id="nacos.idea.plugin.setting"
+                             instance="io.github.guoyixing.nacosideaplugin.ui.setting.SettingFactory" />
+
+        <postStartupActivity implementation="io.github.guoyixing.nacosideaplugin.ui.run.RunProjectActivity" />
     </extensions>
 </idea-plugin>
