@@ -1,6 +1,7 @@
-package io.github.guoyixing.nacosideaplugin.ui.setting
+package io.github.guoyixing.nacosideaplugin.setting
 
 import com.intellij.openapi.options.SearchableConfigurable
+import io.github.guoyixing.nacosideaplugin.setting.ui.SettingUi
 import javax.swing.JComponent
 
 /**

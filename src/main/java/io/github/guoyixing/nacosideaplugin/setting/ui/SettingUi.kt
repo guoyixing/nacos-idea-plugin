@@ -1,4 +1,4 @@
-package io.github.guoyixing.nacosideaplugin.ui.setting
+package io.github.guoyixing.nacosideaplugin.setting.ui
 
 import javax.swing.BoxLayout
 import javax.swing.JPanel

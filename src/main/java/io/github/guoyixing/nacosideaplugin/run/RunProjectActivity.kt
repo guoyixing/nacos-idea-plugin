@@ -1,4 +1,4 @@
-package io.github.guoyixing.nacosideaplugin.ui.run
+package io.github.guoyixing.nacosideaplugin.run
 
 import com.intellij.execution.ui.RunContentManager
 import com.intellij.openapi.project.Project
@@ -19,6 +19,6 @@ class RunProjectActivity : ProjectActivity {
      */
     override suspend fun execute(project: Project) {
         val connection: MessageBusConnection = project.messageBus.connect()
-        connection.subscribe(RunContentManager.TOPIC, RunContentListener())
+        connection.subscribe(RunContentManager.TOPIC, RunContentListener(project))
     }
 }
