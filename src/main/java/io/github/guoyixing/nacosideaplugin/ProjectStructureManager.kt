@@ -1,46 +1,49 @@
 package io.github.guoyixing.nacosideaplugin
 
+import com.intellij.openapi.application.runReadAction
+import com.intellij.openapi.fileEditor.FileDocumentManager
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.vfs.VfsUtil
 import com.intellij.openapi.vfs.VirtualFile
-import org.gradle.internal.impldep.org.testng.internal.YamlParser
+import io.github.guoyixing.nacosideaplugin.nacos.config.YamlParser
+import io.github.guoyixing.nacosideaplugin.nacos.config.model.NacosConfiguration
 import org.jetbrains.idea.maven.project.MavenProjectsManager
-import org.jetbrains.yaml.YAMLUtil
-import org.yaml.snakeyaml.Yaml
 import java.io.File
-import java.io.InputStream
 
 /**
  * 用来分析项目结构
  */
-class ProjectStructureManager(
-    private val project: Project
-) {
-    private val mavenProjectsManager = MavenProjectsManager.getInstance(project)
+object ProjectStructureManager {
+    var project: Project? = null
 
-    private val modulePaths: MutableMap<String,String> = mutableMapOf()
+    var mavenProjectsManager: MavenProjectsManager? = null
 
-    private val moduleBootstrapPaths: MutableMap<String,String> = mutableMapOf()
+    var modulePaths: MutableMap<String, String> = mutableMapOf()
 
+    var moduleBootstrapPaths: MutableMap<String, String> = mutableMapOf()
+
+    var moduleBootstrap: MutableMap<String, NacosConfiguration> = mutableMapOf()
+
+    fun init(project: Project) {
+        this.project = project
+        mavenProjectsManager = MavenProjectsManager.getInstance(project)
+    }
 
     /**
      * 判断是否是Maven项目
      */
     fun isMaven(): Boolean {
-        return mavenProjectsManager != null && mavenProjectsManager.isMavenizedProject
+        return mavenProjectsManager?.isMavenizedProject == true
     }
 
     /**
      * 获取Maven项目的模块
      */
-    fun getMavenModules(){
-        mavenProjectsManager.projects.forEach {
+    fun getMavenModules() {
+        mavenProjectsManager?.projects?.forEach {
             val pathIndex = it.file.path.indexOfLast { it == '/' }
-            val modulePath = it.file.path.substring(0,pathIndex)
+            val modulePath = it.file.path.substring(0, pathIndex)
             modulePaths[it.displayName] = modulePath
-
-            println(it.displayName)
-            println(modulePath)
         }
     }
 
@@ -51,17 +54,23 @@ class ProjectStructureManager(
         modulePaths.forEach { (moduleName, modulePath) ->
             val bootstrapPath = "$modulePath/src/main/resources/bootstrap.yml"
             moduleBootstrapPaths[moduleName] = bootstrapPath
+        }
+    }
 
+    fun getBootstrap() {
+        moduleBootstrapPaths.forEach { (moduleName, bootstrapPath) ->
+            val virtualFile: VirtualFile? = VfsUtil.findFileByIoFile(File(bootstrapPath), true)
 
-            val virtualFile: VirtualFile? = VfsUtil.findFileByIoFile(java.io.File(bootstrapPath), true)
-            val yaml = Yaml()
-            val file = File(bootstrapPath)
-            if(file.exists()) {
-
-
-                val bootstrap = yaml.load<Map<String, Any>>(file.inputStream())
-
-                println(bootstrap)
+            val yamlParser = YamlParser()
+            virtualFile?.let {
+                runReadAction {
+                    val document = FileDocumentManager.getInstance().getDocument(virtualFile)
+                    document?.let {
+                        val nacosConfiguration = yamlParser.parser(document)
+                        moduleBootstrap[moduleName] = nacosConfiguration
+                        println(nacosConfiguration)
+                    }
+                }
             }
         }
     }

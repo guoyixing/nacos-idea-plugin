@@ -4,7 +4,7 @@ import com.intellij.execution.ui.RunContentManager
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.startup.ProjectActivity
 import com.intellij.util.messages.MessageBusConnection
-import io.github.guoyixing.nacosideaplugin.run.RunContentListener
+import io.github.guoyixing.nacosideaplugin.core.run.RunContentListener
 
 
 /**
@@ -20,10 +20,11 @@ class ProjectActivity : ProjectActivity {
      */
     override suspend fun execute(project: Project) {
         //分析项目的结构
-        val projectStructureManager = ProjectStructureManager(project)
-        if (projectStructureManager.isMaven()) {
-            projectStructureManager.getMavenModules()
-            projectStructureManager.getBootstrapPath()
+        ProjectStructureManager.init(project)
+        if (ProjectStructureManager.isMaven()) {
+            ProjectStructureManager.getMavenModules()
+            ProjectStructureManager.getBootstrapPath()
+            ProjectStructureManager.getBootstrap()
         }
 
         val connection: MessageBusConnection = project.messageBus.connect()

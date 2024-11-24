@@ -1,4 +1,4 @@
-package io.github.guoyixing.nacosideaplugin.setting.ui
+package io.github.guoyixing.nacosideaplugin.core.setting.ui
 
 import com.intellij.ui.TitledSeparator
 import javax.swing.BoxLayout
