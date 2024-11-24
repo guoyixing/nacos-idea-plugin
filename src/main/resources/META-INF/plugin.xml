@@ -20,6 +20,7 @@
     <!-- Product and plugin compatibility requirements.
          Read more: https://plugins.jetbrains.com/docs/intellij/plugin-compatibility.html -->
     <depends>com.intellij.modules.platform</depends>
+    <depends>org.jetbrains.idea.maven</depends>
 
     <!-- Extension points defined by the plugin.
          Read more: https://plugins.jetbrains.com/docs/intellij/plugin-extension-points.html -->
@@ -27,6 +28,6 @@
         <projectConfigurable groupId="tools" displayName="Nacos" id="nacos.idea.plugin.setting"
                              instance="io.github.guoyixing.nacosideaplugin.setting.SettingFactory" />
 
-        <postStartupActivity implementation="io.github.guoyixing.nacosideaplugin.run.RunProjectActivity" />
+        <postStartupActivity implementation="io.github.guoyixing.nacosideaplugin.ProjectActivity" />
     </extensions>
 </idea-plugin>

@@ -17,8 +17,9 @@ intellij {
     version.set("2023.2.6")
     type.set("IC") // Target IDE Platform
 
-    plugins.set(listOf("java", "gradle"))
+    plugins.set(listOf("java", "gradle","maven","yaml"))
 }
+
 
 tasks {
     // Set the JVM compatibility versions

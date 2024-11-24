@@ -26,17 +26,15 @@ class RunContentListener(
 
         descriptor?.runnerLayoutUi?.contentManager?.let {
             val executionManager = ExecutionManagerImpl.getInstance(project)
-            var executionEnvironments = executionManager.getExecutionEnvironments(descriptor)
+            val executionEnvironments = executionManager.getExecutionEnvironments(descriptor)
             executionEnvironments.forEach{ env ->
-                var runConfigurationType = env.runnerAndConfigurationSettings?.configuration?.type
+                val runConfigurationType = env.runnerAndConfigurationSettings?.configuration?.type
                 // 创建新的 Content 实例
                 val content = ContentFactory.getInstance().createContent(RunContentUi(runConfigurationType), "Nacos", true)
 
                 // 将新的 Content 添加到 ContentManager
                 it.addContent(content)
             }
-
-
         }
     }
 
