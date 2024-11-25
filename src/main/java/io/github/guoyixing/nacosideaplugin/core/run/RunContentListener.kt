@@ -34,8 +34,8 @@ class RunContentListener(
                     (env.runnerAndConfigurationSettings?.configuration as ApplicationConfiguration).configurationModule.moduleName
                 val nacosConfiguration = ProjectStructureManager.moduleBootstrap[moduleName]
                 // 创建新的 Content 实例
-                val content = ContentFactory.getInstance().createContent(RunContentUi(nacosConfiguration), "Nacos", true)
-
+                val content = ContentFactory.getInstance().createContent(RunContentUi(project,nacosConfiguration), "Nacos", true)
+                content.isCloseable = false
                 // 将新的 Content 添加到 ContentManager
                 it.addContent(content)
             }

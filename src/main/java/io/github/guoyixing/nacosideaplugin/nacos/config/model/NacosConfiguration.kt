@@ -3,14 +3,11 @@ package io.github.guoyixing.nacosideaplugin.nacos.config.model
 /**
  * Nacos配置
  */
-class NacosConfiguration(
-    private val applicationName: String,
-    private val discoveryServer: String,
-    private val configServer: String,
-    private val userName: String = "nacos",
-    private val password: String = "nacos"
-){
-    override fun toString(): String {
-        return "NacosConfiguration(applicationName='$applicationName', discoveryServer='$discoveryServer', configServer='$configServer')"
-    }
-}
+data class NacosConfiguration(
+    val applicationName: String,
+    val discoveryServer: String,
+    val configServer: String,
+    val namespaceId: String = "public",
+    val userName: String = "nacos",
+    val password: String = "nacos"
+)
