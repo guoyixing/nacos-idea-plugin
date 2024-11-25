@@ -7,7 +7,9 @@ data class NacosConfiguration(
     val applicationName: String,
     val discoveryServer: String,
     val configServer: String,
+    val configPrefix:String? = null,
     val namespaceId: String = "public",
     val userName: String = "nacos",
-    val password: String = "nacos"
+    val password: String = "nacos",
+    val auth: Boolean = false
 )

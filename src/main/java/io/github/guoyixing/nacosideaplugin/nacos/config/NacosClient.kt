@@ -39,6 +39,7 @@ class NacosClient(
                         parameter("username", nacosConfiguration.userName)
                         parameter("password", nacosConfiguration.password)
                     }
+                    println(resp.bodyAsText())
                     json.decodeFromString<NacosLoginResp>(resp.bodyAsText()).let {
                         ttl = it.tokenTtl
                         accessToken = it.accessToken
@@ -50,14 +51,20 @@ class NacosClient(
         return accessToken!!
     }
 
-    fun getConfigs(): NacosBaseResp<List<NacosConfigsResp>> {
+    fun getConfigs(): List<NacosConfigsResp> {
         return runBlocking {
             HttpClient().use { client ->
                 val resp = client.get("http://${nacosConfiguration.configServer}/nacos/v2/cs/history/configs") {
                     parameter("namespaceId", nacosConfiguration.namespaceId)
-                    parameter("accessToken", getAccessToken())
+                    if (nacosConfiguration.auth) {
+                        parameter("accessToken", getAccessToken())
+                    }
                 }
-                json.decodeFromString<NacosBaseResp<List<NacosConfigsResp>>>(resp.bodyAsText())
+                val configsResp = json.decodeFromString<NacosBaseResp<List<NacosConfigsResp>>>(resp.bodyAsText())
+                configsResp.data.filter {
+                    it.dataId.startsWith(nacosConfiguration.configPrefix ?: nacosConfiguration.applicationName)
+                }
+
             }
         }
 
