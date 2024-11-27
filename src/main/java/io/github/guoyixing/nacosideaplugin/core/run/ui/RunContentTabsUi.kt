@@ -27,9 +27,9 @@ class RunContentTabsUi(
         addTab(configurationTabInfo, 1)
 
 
-        val serviceTabInfo = TabInfo(JPanel())
-        serviceTabInfo.text = "服务"
-        addTab(serviceTabInfo, 2)
+//        val serviceTabInfo = TabInfo(JPanel())
+//        serviceTabInfo.text = "服务"
+//        addTab(serviceTabInfo, 2)
     }
 
 

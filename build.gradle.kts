@@ -6,7 +6,7 @@ plugins {
 }
 
 group = "io.github.guoyixing"
-version = "1.0-SNAPSHOT"
+version = "0.2"
 
 repositories {
     mavenCentral()

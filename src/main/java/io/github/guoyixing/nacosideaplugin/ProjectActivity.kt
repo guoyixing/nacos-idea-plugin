@@ -21,13 +21,12 @@ class ProjectActivity : ProjectActivity {
     override suspend fun execute(project: Project) {
         //分析项目的结构
         ProjectStructureManager.init(project)
-        if (ProjectStructureManager.isMaven()) {
-            ProjectStructureManager.getMavenModules()
-            ProjectStructureManager.getBootstrapPath()
-            ProjectStructureManager.getBootstrap()
+        if (ProjectStructureManager.isMaven(project)) {
+            ProjectStructureManager.getMavenModules(project)
+            ProjectStructureManager.getBootstrapPath(project)
+            ProjectStructureManager.getBootstrap(project)
+            val connection: MessageBusConnection = project.messageBus.connect()
+            connection.subscribe(RunContentManager.TOPIC, RunContentListener(project))
         }
-
-        val connection: MessageBusConnection = project.messageBus.connect()
-        connection.subscribe(RunContentManager.TOPIC, RunContentListener(project))
     }
 }

@@ -5,7 +5,7 @@
 
     <!-- Public plugin name should be written in Title Case.
          Guidelines: https://plugins.jetbrains.com/docs/marketplace/plugin-overview-page.html#plugin-name -->
-    <name>NacosConnect</name>
+    <name>Nacos Support</name>
 
     <!-- A displayed Vendor name or Organization ID displayed on the Plugins Page. -->
     <vendor email="904985041@qq.com" url="https://gitee.com/qiaodaimadewangcai">敲代码的旺财</vendor>
@@ -14,7 +14,16 @@
          Simple HTML elements (text formatting, paragraphs, and lists) can be added inside of <![CDATA[ ]]> tag.
          Guidelines: https://plugins.jetbrains.com/docs/marketplace/plugin-overview-page.html#plugin-description -->
     <description><![CDATA[
-    这是一个用于连接Nacos的插件，可以方便的连接Nacos，查看配置，修改配置，删除配置等操作。
+    <p>这是一个用于连接Nacos的插件，可以方便的连接Nacos，查看配置，修改配置等操作。</p>
+    <p>在Run、Debug、Service工具中会多出一个Nacos页签</p>
+    <p>自动根据每个服务的bootstrap.yml自动连接nacos，暂时支持yaml格式的配置文件。</p>
+    <p>暂时只会根据配置文件中的spring.application.name作为前缀获取配置，后续会支持更多的配置。</p>
+    <p>This is a plugin for connecting to Nacos, which allows for easy connection to Nacos, viewing configurations, modifying configurations, and other operations.</p>
+    <p>An additional Nacos tab will appear in the Run, Debug, and Service tools.</p>
+    <p>It automatically connects to Nacos based on each service's bootstrap.yml, and currently supports configuration files in yaml format.</p>
+    <p>Currently, it only retrieves configurations using the spring.application.name from the configuration file as a prefix, but more configurations will be supported in the future.</p>
+    <img src="https://gyxtp.oss-cn-shenzhen.aliyuncs.com/nacosIdeaPlugin/run.png" />
+    <img src="https://gyxtp.oss-cn-shenzhen.aliyuncs.com/nacosIdeaPlugin/service.png" />
   ]]></description>
 
     <!-- Product and plugin compatibility requirements.

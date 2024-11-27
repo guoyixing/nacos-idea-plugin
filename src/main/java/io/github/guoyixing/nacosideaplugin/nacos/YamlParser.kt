@@ -28,10 +28,10 @@ class YamlParser {
 
         val config = nacos["config"] as Map<*, *>
         val configServerAdd = config["server-addr"] as String
-        val configExtensionConfigs = config["extension-configs"]
-        if (configExtensionConfigs != null){
-            val extensionConfigs = configExtensionConfigs as List<String>
-        }
+//        val configExtensionConfigs = config["extension-configs"]
+//        if (configExtensionConfigs != null){
+//            val extensionConfigs = configExtensionConfigs as List<String>
+//        }
 
         return NacosConfiguration(
             applicationName = applicationName,
