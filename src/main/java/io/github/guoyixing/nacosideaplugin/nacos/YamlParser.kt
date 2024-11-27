@@ -1,4 +1,4 @@
-package io.github.guoyixing.nacosideaplugin.nacos.config
+package io.github.guoyixing.nacosideaplugin.nacos
 
 import com.intellij.openapi.editor.Document
 import io.github.guoyixing.nacosideaplugin.nacos.config.model.NacosConfiguration
@@ -24,9 +24,14 @@ class YamlParser {
         val cloud = spring["cloud"] as Map<*, *>
         val nacos = cloud["nacos"] as Map<*, *>
         val discovery = nacos["discovery"] as Map<*, *>
-        val config = nacos["config"] as Map<*, *>
         val discoveryServerAdd= discovery["server-addr"] as String
+
+        val config = nacos["config"] as Map<*, *>
         val configServerAdd = config["server-addr"] as String
+        val configExtensionConfigs = config["extension-configs"]
+        if (configExtensionConfigs != null){
+            val extensionConfigs = configExtensionConfigs as List<String>
+        }
 
         return NacosConfiguration(
             applicationName = applicationName,

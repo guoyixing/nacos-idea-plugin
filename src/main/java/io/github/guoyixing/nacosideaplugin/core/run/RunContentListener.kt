@@ -20,24 +20,29 @@ class RunContentListener(
     private val project: Project
 ) : RunContentWithExecutorListener {
 
+    private var runContentUi:RunContentUi? = null
+
     /**
      * 当RunPlugin被选中时执行的逻辑
      */
     override fun contentSelected(descriptor: RunContentDescriptor?, executor: Executor) {
 
-
-        descriptor?.runnerLayoutUi?.contentManager?.let {
-            val executionManager = ExecutionManagerImpl.getInstance(project)
-            val executionEnvironments = executionManager.getExecutionEnvironments(descriptor)
-            executionEnvironments.forEach{ env ->
-                val moduleName =
-                    (env.runnerAndConfigurationSettings?.configuration as ApplicationConfiguration).configurationModule.moduleName
-                val nacosConfiguration = ProjectStructureManager.moduleBootstrap[moduleName]
-                // 创建新的 Content 实例
-                val content = ContentFactory.getInstance().createContent(RunContentUi(project,nacosConfiguration), "Nacos", true)
-                content.isCloseable = false
-                // 将新的 Content 添加到 ContentManager
-                it.addContent(content)
+        if (runContentUi == null) {
+            descriptor?.runnerLayoutUi?.contentManager?.let {
+                val executionManager = ExecutionManagerImpl.getInstance(project)
+                val executionEnvironments = executionManager.getExecutionEnvironments(descriptor)
+                executionEnvironments.forEach { env ->
+                    val moduleName =
+                        (env.runnerAndConfigurationSettings?.configuration as ApplicationConfiguration).configurationModule.moduleName
+                    val nacosConfiguration = ProjectStructureManager.moduleBootstrap[moduleName]
+                    // 创建新的 Content 实例
+                    runContentUi=RunContentUi(project, nacosConfiguration)
+                    val content = ContentFactory.getInstance()
+                        .createContent(runContentUi, "Nacos", true)
+                    content.isCloseable = false
+                    // 将新的 Content 添加到 ContentManager
+                    it.addContent(content)
+                }
             }
         }
     }
@@ -46,6 +51,7 @@ class RunContentListener(
      * 当RunPlugin被移除时执行的逻辑
      */
     override fun contentRemoved(descriptor: RunContentDescriptor?, executor: Executor) {
+        runContentUi = null
     }
 
 }

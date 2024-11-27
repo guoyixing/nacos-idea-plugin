@@ -1,14 +1,12 @@
 package io.github.guoyixing.nacosideaplugin.core.run.ui
 
-import com.intellij.openapi.editor.Document
-import com.intellij.openapi.editor.Editor
-import com.intellij.openapi.editor.EditorFactory
-import com.intellij.openapi.fileTypes.FileTypeManager
-import com.intellij.openapi.fileTypes.PlainTextFileType
 import com.intellij.openapi.project.Project
-import io.github.guoyixing.nacosideaplugin.nacos.config.NacosClient
+import io.github.guoyixing.nacosideaplugin.common.NotifyUtil
+import io.github.guoyixing.nacosideaplugin.core.run.RunContentConfigurationActivity
+import io.github.guoyixing.nacosideaplugin.core.run.RunContentConfigurationContext
 import java.awt.BorderLayout
 import java.awt.FlowLayout
+import java.awt.event.ActionListener
 import javax.swing.JButton
 import javax.swing.JPanel
 
@@ -20,33 +18,40 @@ import javax.swing.JPanel
  */
 class RunContentConfigurationContentUi(
     private val project: Project,
-    private val nacosClient: NacosClient
+    private val context: RunContentConfigurationContext,
+    private val activity: RunContentConfigurationActivity
 ) : JPanel() {
 
     init {
         layout = BorderLayout()
 
-        val yamlFile = """
-            server:
-              port: 8080
-            spring:
-              application:
-                name: nacos-idea-plugin
-            nacos:
-              config:
-                server-addr: http://
-        """.trimIndent()
-        val editor = createEditorFromContent(yamlFile)
+        val editor = context.editor
         add(editor.component, BorderLayout.CENTER)
         val buttonPanel = JPanel(FlowLayout(FlowLayout.RIGHT))
-        buttonPanel.add(JButton("还原"))
-        buttonPanel.add(JButton("保存"))
+        val saveButton = JButton("保存")
+        saveButton.addActionListener(saveAction())
+        val refreshButton = JButton("刷新")
+        refreshButton.addActionListener(refreshAction())
+
+        buttonPanel.add(refreshButton)
+        buttonPanel.add(saveButton)
         add(buttonPanel, BorderLayout.SOUTH)
     }
 
-    private fun createEditorFromContent(content: String): Editor {
-        val document: Document = EditorFactory.getInstance().createDocument(content)
-        val fileType = FileTypeManager.getInstance().getFileTypeByExtension("yaml")
-        return EditorFactory.getInstance().createEditor(document, project, fileType, false)
+    private fun saveAction(): ActionListener {
+        return ActionListener {
+            val selectConfiguration = context.selectConfiguration
+            val configData = context.editor.document.text
+            if (selectConfiguration != null) {
+                context.nacosClient.updateConfig(selectConfiguration, configData)
+                NotifyUtil.notify(project, "Nacos", "保存成功")
+            }
+        }
+    }
+
+    private fun refreshAction(): ActionListener {
+        return ActionListener {
+            activity.updateEditor(context.selectConfiguration)
+        }
     }
 }

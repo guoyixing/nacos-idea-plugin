@@ -3,7 +3,7 @@ package io.github.guoyixing.nacosideaplugin.core.run.ui
 import com.intellij.openapi.project.Project
 import com.intellij.ui.tabs.TabInfo
 import com.intellij.ui.tabs.impl.JBTabsImpl
-import io.github.guoyixing.nacosideaplugin.nacos.config.NacosClient
+import io.github.guoyixing.nacosideaplugin.nacos.NacosClient
 import java.awt.BorderLayout
 import javax.swing.JPanel
 

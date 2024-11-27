@@ -5,7 +5,7 @@ import com.intellij.openapi.fileEditor.FileDocumentManager
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.vfs.VfsUtil
 import com.intellij.openapi.vfs.VirtualFile
-import io.github.guoyixing.nacosideaplugin.nacos.config.YamlParser
+import io.github.guoyixing.nacosideaplugin.nacos.YamlParser
 import io.github.guoyixing.nacosideaplugin.nacos.config.model.NacosConfiguration
 import org.jetbrains.idea.maven.project.MavenProjectsManager
 import java.io.File

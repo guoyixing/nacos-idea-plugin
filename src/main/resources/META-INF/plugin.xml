@@ -29,5 +29,7 @@
                              instance="io.github.guoyixing.nacosideaplugin.core.setting.SettingFactory" />
 
         <postStartupActivity implementation="io.github.guoyixing.nacosideaplugin.ProjectActivity" />
+
+        <notificationGroup id="Nacos" displayType="BALLOON" />
     </extensions>
 </idea-plugin>

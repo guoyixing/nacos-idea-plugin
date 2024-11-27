@@ -1,7 +1,7 @@
 package io.github.guoyixing.nacosideaplugin.core.run.ui
 
 import com.intellij.openapi.project.Project
-import io.github.guoyixing.nacosideaplugin.nacos.config.NacosClient
+import io.github.guoyixing.nacosideaplugin.nacos.NacosClient
 import io.github.guoyixing.nacosideaplugin.nacos.config.model.NacosConfiguration
 import java.awt.BorderLayout
 import javax.swing.JLabel

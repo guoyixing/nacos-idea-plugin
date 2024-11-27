@@ -1,4 +1,4 @@
-package io.github.guoyixing.nacosideaplugin.nacos.config
+package io.github.guoyixing.nacosideaplugin.nacos
 
 import io.github.guoyixing.nacosideaplugin.nacos.config.model.NacosBaseResp
 import io.github.guoyixing.nacosideaplugin.nacos.config.model.NacosConfigsResp
@@ -67,7 +67,42 @@ class NacosClient(
 
             }
         }
+    }
 
+    fun getConfig(config:NacosConfigsResp):String {
+        return runBlocking {
+            HttpClient().use { client ->
+                val resp = client.get("http://${nacosConfiguration.configServer}/nacos/v2/cs/config") {
+                    parameter("namespaceId", nacosConfiguration.namespaceId)
+                    parameter("dataId", config.dataId)
+                    parameter("group", config.group)
+                    if (nacosConfiguration.auth) {
+                        parameter("accessToken", getAccessToken())
+                    }
+                }
+                val configsResp = json.decodeFromString<NacosBaseResp<String>>(resp.bodyAsText())
+                configsResp.data
+            }
+        }
+    }
+
+    fun updateConfig(config:NacosConfigsResp, content:String):Boolean {
+        return runBlocking {
+            HttpClient().use { client ->
+                val resp = client.post("http://${nacosConfiguration.configServer}/nacos/v2/cs/config") {
+                    parameter("namespaceId", nacosConfiguration.namespaceId)
+                    parameter("dataId", config.dataId)
+                    parameter("group", config.group)
+                    parameter("content", content.replace("\n", "\r\n"))
+                    parameter("type", config.type)
+                    if (nacosConfiguration.auth) {
+                        parameter("accessToken", getAccessToken())
+                    }
+                }
+                val configsResp = json.decodeFromString<NacosBaseResp<Boolean>>(resp.bodyAsText())
+                configsResp.data
+            }
+        }
     }
 
 }
