@@ -8,7 +8,6 @@ import com.intellij.execution.ui.RunContentWithExecutorListener
 import com.intellij.openapi.project.Project
 import com.intellij.ui.content.ContentFactory
 import io.github.guoyixing.nacosideaplugin.ProjectStructureManager
-import io.github.guoyixing.nacosideaplugin.common.NotifyUtil
 import io.github.guoyixing.nacosideaplugin.core.run.ui.RunContentUi
 
 /**
@@ -28,7 +27,6 @@ class RunContentListener(
      */
     override fun contentSelected(descriptor: RunContentDescriptor?, executor: Executor) {
         try {
-
             descriptor?.runnerLayoutUi?.contentManager?.let {
                 val executionManager = ExecutionManagerImpl.getInstance(project)
                 val executionEnvironments = executionManager.getExecutionEnvironments(descriptor)

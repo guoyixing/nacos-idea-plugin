@@ -105,4 +105,19 @@ class NacosClient(
         }
     }
 
+    fun getServiceInstancesByApplication(): List<String> {
+        return runBlocking {
+            HttpClient().use { client ->
+                val resp = client.get("http://${nacosConfiguration.discoveryServer}/nacos/v2/ns/instance/list") {
+                    parameter("namespaceId", nacosConfiguration.namespaceId)
+                    parameter("serviceName", nacosConfiguration.applicationName)
+                    if (nacosConfiguration.auth) {
+                        parameter("accessToken", getAccessToken())
+                    }
+                }
+                val servicesResp = json.decodeFromString<NacosBaseResp<List<String>>>(resp.bodyAsText())
+                servicesResp.data
+            }
+        }
+    }
 }
