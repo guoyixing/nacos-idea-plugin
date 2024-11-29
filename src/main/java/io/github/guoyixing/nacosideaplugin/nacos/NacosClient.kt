@@ -1,9 +1,6 @@
 package io.github.guoyixing.nacosideaplugin.nacos
 
-import io.github.guoyixing.nacosideaplugin.nacos.config.model.NacosBaseResp
-import io.github.guoyixing.nacosideaplugin.nacos.config.model.NacosConfigsResp
-import io.github.guoyixing.nacosideaplugin.nacos.config.model.NacosConfiguration
-import io.github.guoyixing.nacosideaplugin.nacos.config.model.NacosLoginResp
+import io.github.guoyixing.nacosideaplugin.nacos.config.model.*
 import io.ktor.client.*
 import io.ktor.client.request.*
 import io.ktor.client.statement.*
@@ -39,7 +36,7 @@ class NacosClient(
                         parameter("username", nacosConfiguration.userName)
                         parameter("password", nacosConfiguration.password)
                     }
-                    println(resp.bodyAsText())
+
                     json.decodeFromString<NacosLoginResp>(resp.bodyAsText()).let {
                         ttl = it.tokenTtl
                         accessToken = it.accessToken
@@ -105,7 +102,7 @@ class NacosClient(
         }
     }
 
-    fun getServiceInstancesByApplication(): List<String> {
+    fun getServiceInstancesByApplication(): NacosServiceInstancesResp {
         return runBlocking {
             HttpClient().use { client ->
                 val resp = client.get("http://${nacosConfiguration.discoveryServer}/nacos/v2/ns/instance/list") {
@@ -115,7 +112,7 @@ class NacosClient(
                         parameter("accessToken", getAccessToken())
                     }
                 }
-                val servicesResp = json.decodeFromString<NacosBaseResp<List<String>>>(resp.bodyAsText())
+                val servicesResp = json.decodeFromString<NacosBaseResp<NacosServiceInstancesResp>>(resp.bodyAsText())
                 servicesResp.data
             }
         }

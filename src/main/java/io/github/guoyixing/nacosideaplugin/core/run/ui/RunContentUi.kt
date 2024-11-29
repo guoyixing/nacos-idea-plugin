@@ -27,7 +27,7 @@ class RunContentUi(
             val configurationTabInfo = TabInfo(RunContentConfigurationUi(project, nacosClient))
             configurationTabInfo.text = "配置"
 
-            val serviceTabInfo = TabInfo(JPanel())
+            val serviceTabInfo = TabInfo(RunContentServiceInstanceUi(project, nacosClient))
             serviceTabInfo.text = "服务"
 
             val jbTabs = JBTabsFactory.createTabs(project).also {

@@ -14,10 +14,27 @@ data class NacosServiceInstancesResp(
     val groupName: String,
     val clusters : String?,
     val cacheMillis : Int,
-    val lastRefTime : Int,
-    val checksum : Int,
+    val lastRefTime : Long,
+    val checksum : String?,
     val allIPs : Boolean,
     val reachProtectionThreshold : Boolean,
     val valid : Boolean,
+    val hosts : List<Host>
 
-)
+){
+    @Serializable
+    data class Host(
+        val ip : String,
+        val port : Int,
+        val weight : Double,
+        val healthy : Boolean,
+        var enabled : Boolean,
+        val ephemeral : Boolean,
+        val clusterName : String,
+        val serviceName : String,
+        val metadata : Map<String, String>,
+        val instanceHeartBeatTimeOut : Int,
+        val ipDeleteTimeout : Int,
+        val instanceHeartBeatInterval : Int
+    )
+}

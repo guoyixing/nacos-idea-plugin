@@ -61,7 +61,6 @@ object ProjectStructureManager {
                     document?.let {
                         val nacosConfiguration = yamlParser.parser(document)
                         projects[project]!!.moduleBootstrap[moduleName] = nacosConfiguration
-                        println(nacosConfiguration)
                     }
                 }
             }
