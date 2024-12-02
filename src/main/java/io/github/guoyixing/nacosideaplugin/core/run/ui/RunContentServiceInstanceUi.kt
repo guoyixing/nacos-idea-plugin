@@ -5,6 +5,9 @@ import com.intellij.ui.components.JBScrollPane
 import com.intellij.ui.table.JBTable
 import io.github.guoyixing.nacosideaplugin.nacos.NacosClient
 import java.awt.BorderLayout
+import java.awt.FlowLayout
+import java.awt.event.ActionListener
+import javax.swing.JButton
 import javax.swing.JPanel
 
 
@@ -16,7 +19,7 @@ import javax.swing.JPanel
  */
 class RunContentServiceInstanceUi(
     private val project: Project,
-    nacosClient: NacosClient
+    private val nacosClient: NacosClient
 ) : JPanel() {
     init {
         layout = BorderLayout()
@@ -46,5 +49,37 @@ class RunContentServiceInstanceUi(
 
         val scrollPane = JBScrollPane(jbTable)
         add(scrollPane, BorderLayout.CENTER)
+
+        val refreshButton = JButton("刷新")
+        refreshButton.addActionListener(refreshAction(jbTable))
+
+        val buttonPanel = JPanel(FlowLayout(FlowLayout.RIGHT))
+        buttonPanel.add(refreshButton)
+        add(buttonPanel, BorderLayout.SOUTH)
+    }
+
+    private fun refreshAction(jbTable: JBTable): ActionListener {
+        return ActionListener {
+            val serviceInstances = nacosClient.getServiceInstancesByApplication()
+
+
+            val hosts = serviceInstances.hosts
+
+            val data = Array(hosts.size) {
+                arrayOf(
+                    hosts[it].ip,
+                    hosts[it].port,
+                    hosts[it].weight,
+                    hosts[it].healthy,
+                    hosts[it]
+                )
+            }
+
+            val columnNames = arrayOf<Any>("IP", "Port", "Weight", "Healthy", "Operate")
+            val model = ServiceInstanceTableModel(data, columnNames)
+            jbTable.model = model
+            jbTable.columnModel.getColumn(4).cellRenderer = ServiceInstanceCellRenderer()
+            jbTable.columnModel.getColumn(4).cellEditor = ServiceInstanceOperateEditor()
+        }
     }
 }

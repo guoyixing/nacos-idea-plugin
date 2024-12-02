@@ -5,9 +5,11 @@ import com.intellij.openapi.fileEditor.FileDocumentManager
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.vfs.VfsUtil
 import com.intellij.openapi.vfs.VirtualFile
+import com.intellij.openapi.vfs.VirtualFileManager
 import io.github.guoyixing.nacosideaplugin.nacos.YamlParser
 import org.jetbrains.idea.maven.project.MavenProjectsManager
 import java.io.File
+
 
 /**
  * 用来分析项目结构
@@ -17,9 +19,14 @@ object ProjectStructureManager {
     val projects: MutableMap<Project, ProjectStructure> = mutableMapOf()
 
     fun init(project: Project) {
-        projects[project] = ProjectStructure(
+        ProjectStructure(
             mavenProjectsManager = MavenProjectsManager.getInstance(project)
-        )
+        ).let {
+            projects[project] = it
+            VirtualFileManager.getInstance()
+                .addAsyncFileListener(ProjectStructureAsyncFileListener(it), NacosPluginDisposable.getInstance(project))
+        }
+
     }
 
     /**
