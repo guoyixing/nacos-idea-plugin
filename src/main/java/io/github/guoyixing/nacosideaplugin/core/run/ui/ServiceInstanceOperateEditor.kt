@@ -1,9 +1,10 @@
 package io.github.guoyixing.nacosideaplugin.core.run.ui
 
-import com.intellij.codeInsight.options.JavaInspectionControls.button
+import com.intellij.openapi.project.Project
+import io.github.guoyixing.nacosideaplugin.common.NotifyUtil
+import io.github.guoyixing.nacosideaplugin.nacos.NacosClient
 import io.github.guoyixing.nacosideaplugin.nacos.config.model.NacosServiceInstancesResp
 import java.awt.Component
-import java.awt.event.ActionListener
 import javax.swing.*
 
 
@@ -13,7 +14,10 @@ import javax.swing.*
  * @author 郭一行
  * @date 2024/11/29 16:29
  */
-class ServiceInstanceOperateEditor:DefaultCellEditor(JTextField()) {
+class ServiceInstanceOperateEditor(
+    private val project: Project,
+    private val nacosClient: NacosClient
+) :DefaultCellEditor(JTextField()) {
 
     private var data:NacosServiceInstancesResp.Host? = null
 
@@ -34,9 +38,15 @@ class ServiceInstanceOperateEditor:DefaultCellEditor(JTextField()) {
         data = value
         val button = JButton()
         button.addActionListener {
-            value.enabled = !value.enabled
             fireEditingStopped()
             //发送请求
+            value.enabled = !value.enabled
+            if (!nacosClient.nsServiceInstances(value)) {
+                //通知
+                NotifyUtil.notify(project, "Nacos", "操作失败")
+                value.enabled = !value.enabled
+            }
+
         }
 
         button.text = value.enabled.let { if (it) "下线" else "上线" }

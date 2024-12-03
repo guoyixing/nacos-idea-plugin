@@ -117,4 +117,27 @@ class NacosClient(
             }
         }
     }
+
+    fun nsServiceInstances(host:NacosServiceInstancesResp.Host): Boolean {
+        return runBlocking {
+            HttpClient().use { client ->
+                val resp = client.post("http://${nacosConfiguration.discoveryServer}/nacos/v2/ns/instance") {
+                    parameter("namespaceId", nacosConfiguration.namespaceId)
+                    parameter("serviceName", nacosConfiguration.applicationName)
+                    parameter("ip", host.ip)
+                    parameter("port", host.port)
+                    parameter("clusterName", host.clusterName)
+                    parameter("ephemeral", host.ephemeral)
+                    parameter("weight", host.weight)
+                    parameter("enabled", host.enabled)
+                    parameter("metadata", host.metadata)
+                    if (nacosConfiguration.auth) {
+                        parameter("accessToken", getAccessToken())
+                    }
+                }
+                val servicesResp = json.decodeFromString<NacosBaseResp<String>>(resp.bodyAsText())
+                servicesResp.data=="ok"
+            }
+        }
+    }
 }

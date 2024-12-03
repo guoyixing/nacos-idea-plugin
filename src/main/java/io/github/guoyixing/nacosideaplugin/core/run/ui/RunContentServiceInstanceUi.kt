@@ -45,7 +45,7 @@ class RunContentServiceInstanceUi(
         jbTable.setShowColumns(true)
         jbTable.model = model
         jbTable.columnModel.getColumn(4).cellRenderer = ServiceInstanceCellRenderer()
-        jbTable.columnModel.getColumn(4).cellEditor = ServiceInstanceOperateEditor()
+        jbTable.columnModel.getColumn(4).cellEditor = ServiceInstanceOperateEditor(project,nacosClient)
 
         val scrollPane = JBScrollPane(jbTable)
         add(scrollPane, BorderLayout.CENTER)
@@ -79,7 +79,7 @@ class RunContentServiceInstanceUi(
             val model = ServiceInstanceTableModel(data, columnNames)
             jbTable.model = model
             jbTable.columnModel.getColumn(4).cellRenderer = ServiceInstanceCellRenderer()
-            jbTable.columnModel.getColumn(4).cellEditor = ServiceInstanceOperateEditor()
+            jbTable.columnModel.getColumn(4).cellEditor = ServiceInstanceOperateEditor(project, nacosClient)
         }
     }
 }
