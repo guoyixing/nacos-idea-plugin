@@ -138,11 +138,16 @@ class NacosClient(
                 }
                 val bodyAsText = resp.bodyAsText()
                 println(bodyAsText)
-                val servicesResp = json.decodeFromString<NacosServiceInstancesResp.Catalog>(bodyAsText)
-                servicesResp.list.forEach {
-                    it.groupName = service.groupName
+                if(bodyAsText.startsWith("{")){
+                    val servicesResp = json.decodeFromString<NacosServiceInstancesResp.Catalog>(bodyAsText)
+                    servicesResp.list.forEach {
+                        it.groupName = service.groupName
+                    }
+                    servicesResp.list
+                }else{
+                    emptyList()
                 }
-                servicesResp.list
+
             }
         }
     }
