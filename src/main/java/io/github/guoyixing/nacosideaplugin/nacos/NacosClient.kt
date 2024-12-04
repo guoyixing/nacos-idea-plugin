@@ -66,7 +66,7 @@ class NacosClient(
         }
     }
 
-    fun getConfig(config:NacosConfigsResp):String {
+    fun getConfig(config: NacosConfigsResp): String {
         return runBlocking {
             HttpClient().use { client ->
                 val resp = client.get("http://${nacosConfiguration.configServer}/nacos/v2/cs/config") {
@@ -83,7 +83,7 @@ class NacosClient(
         }
     }
 
-    fun updateConfig(config:NacosConfigsResp, content:String):Boolean {
+    fun updateConfig(config: NacosConfigsResp, content: String): Boolean {
         return runBlocking {
             HttpClient().use { client ->
                 val resp = client.post("http://${nacosConfiguration.configServer}/nacos/v2/cs/config") {
@@ -113,30 +113,58 @@ class NacosClient(
                     }
                 }
                 val servicesResp = json.decodeFromString<NacosBaseResp<NacosServiceInstancesResp>>(resp.bodyAsText())
+                servicesResp.data.hosts.forEach {
+                    it.groupName = servicesResp.data.groupName
+                }
+
                 servicesResp.data
             }
         }
     }
 
-    fun nsServiceInstances(host:NacosServiceInstancesResp.Host): Boolean {
+    fun nsCatalogInstancesByApplication(service: NacosServiceInstancesResp): List<NacosServiceInstancesResp.Host> {
         return runBlocking {
             HttpClient().use { client ->
-                val resp = client.post("http://${nacosConfiguration.discoveryServer}/nacos/v2/ns/instance") {
+                val resp = client.get("http://${nacosConfiguration.discoveryServer}/nacos/v1/ns/catalog/instances") {
                     parameter("namespaceId", nacosConfiguration.namespaceId)
                     parameter("serviceName", nacosConfiguration.applicationName)
-                    parameter("ip", host.ip)
-                    parameter("port", host.port)
-                    parameter("clusterName", host.clusterName)
-                    parameter("ephemeral", host.ephemeral)
-                    parameter("weight", host.weight)
-                    parameter("enabled", host.enabled)
-                    parameter("metadata", host.metadata)
+                    parameter("groupName", service.groupName)
+                    parameter("pageSize", 200)
+                    parameter("pageNo", 1)
+                    parameter("clusterName", service.clusters.isBlank().let { "DEFAULT" })
                     if (nacosConfiguration.auth) {
                         parameter("accessToken", getAccessToken())
                     }
                 }
-                val servicesResp = json.decodeFromString<NacosBaseResp<String>>(resp.bodyAsText())
-                servicesResp.data=="ok"
+                val bodyAsText = resp.bodyAsText()
+                println(bodyAsText)
+                val servicesResp = json.decodeFromString<NacosServiceInstancesResp.Catalog>(bodyAsText)
+                servicesResp.list.forEach {
+                    it.groupName = service.groupName
+                }
+                servicesResp.list
+            }
+        }
+    }
+
+    fun nsServiceInstances(host: NacosServiceInstancesResp.Host): Boolean {
+        return runBlocking {
+            HttpClient().use { client ->
+                val resp = client.put("http://${nacosConfiguration.discoveryServer}/nacos/v1/ns/instance") {
+                    parameter("namespaceId", nacosConfiguration.namespaceId)
+                    parameter("serviceName", nacosConfiguration.applicationName)
+                    parameter("ip", host.ip)
+                    parameter("port", host.port)
+                    parameter("clusterName", host.clusterName.isBlank().let { "DEFAULT" })
+                    parameter("ephemeral", host.ephemeral)
+                    parameter("weight", host.weight)
+                    parameter("enabled", host.enabled)
+                    parameter("groupName", host.groupName)
+                    if (nacosConfiguration.auth) {
+                        parameter("accessToken", getAccessToken())
+                    }
+                }
+                resp.bodyAsText() == "ok"
             }
         }
     }

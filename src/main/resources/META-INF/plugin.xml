@@ -24,6 +24,20 @@
     <p>暂时只会根据配置文件中的spring.application.name作为前缀获取配置，后续会支持更多的配置。</p>
   ]]></description>
 
+    <change-notes>
+        <![CDATA[
+            <p>版本 0.2 更新说明:</p>
+            <ul>
+                <li>修复大量bug</li>
+                <li>添加服务模块</li>
+            </ul>
+            <p>版本 0.1 更新说明:</p>
+            <ul>
+                <li>添加配置模块</li>
+            </ul>
+        ]]>
+    </change-notes>
+
     <!-- Product and plugin compatibility requirements.
          Read more: https://plugins.jetbrains.com/docs/intellij/plugin-compatibility.html -->
     <depends>com.intellij.modules.platform</depends>

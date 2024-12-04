@@ -26,7 +26,7 @@ class RunContentServiceInstanceUi(
         val serviceInstances = nacosClient.getServiceInstancesByApplication()
 
 
-        val hosts = serviceInstances.hosts
+        val hosts = nacosClient.nsCatalogInstancesByApplication(serviceInstances)
 
         val data = Array(hosts.size) {
             arrayOf(
@@ -63,7 +63,7 @@ class RunContentServiceInstanceUi(
             val serviceInstances = nacosClient.getServiceInstancesByApplication()
 
 
-            val hosts = serviceInstances.hosts
+            val hosts = nacosClient.nsCatalogInstancesByApplication(serviceInstances)
 
             val data = Array(hosts.size) {
                 arrayOf(
