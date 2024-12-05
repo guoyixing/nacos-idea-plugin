@@ -3,13 +3,13 @@ package io.github.guoyixing.nacosideaplugin.nacos.config.model
 import kotlinx.serialization.Serializable
 
 /**
- * Nacos服务实例返回
+ * Nacos服务返回
  *
  * @author 郭一行
  * @date 2024/11/28 13:43
  */
 @Serializable
-data class NacosServiceInstancesResp(
+data class NacosServiceResp(
     val name: String,
     val groupName: String="DEFAULT_GROUP",
     val clusters: String = "DEFAULT",
@@ -23,7 +23,7 @@ data class NacosServiceInstancesResp(
 
 ) {
     @Serializable
-    data class Catalog(
+    data class InstanceList (
         val count: Int,
         val list: List<Host>
     )

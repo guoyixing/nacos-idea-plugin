@@ -1,8 +1,6 @@
 package io.github.guoyixing.nacosideaplugin.core.run.ui
 
-import io.github.guoyixing.nacosideaplugin.nacos.config.model.NacosServiceInstancesResp
-import org.jdesktop.swingx.prompt.PromptSupport.setBackground
-import org.jdesktop.swingx.prompt.PromptSupport.setForeground
+import io.github.guoyixing.nacosideaplugin.nacos.config.model.NacosServiceResp
 import java.awt.BorderLayout
 import java.awt.Component
 import javax.swing.*
@@ -27,7 +25,7 @@ class ServiceInstanceCellRenderer(
         row: Int,
         column: Int
     ): Component {
-        if (table == null || value == null || value !is NacosServiceInstancesResp.Host) {
+        if (table == null || value == null || value !is NacosServiceResp.Host) {
             return button
         }
 

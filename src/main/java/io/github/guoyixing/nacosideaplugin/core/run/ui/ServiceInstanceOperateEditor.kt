@@ -3,7 +3,7 @@ package io.github.guoyixing.nacosideaplugin.core.run.ui
 import com.intellij.openapi.project.Project
 import io.github.guoyixing.nacosideaplugin.common.NotifyUtil
 import io.github.guoyixing.nacosideaplugin.nacos.NacosClient
-import io.github.guoyixing.nacosideaplugin.nacos.config.model.NacosServiceInstancesResp
+import io.github.guoyixing.nacosideaplugin.nacos.config.model.NacosServiceResp
 import java.awt.Component
 import javax.swing.*
 
@@ -17,9 +17,9 @@ import javax.swing.*
 class ServiceInstanceOperateEditor(
     private val project: Project,
     private val nacosClient: NacosClient
-) :DefaultCellEditor(JTextField()) {
+) : DefaultCellEditor(JTextField()) {
 
-    private var data:NacosServiceInstancesResp.Host? = null
+    private var data: NacosServiceResp.Host? = null
 
     init {
         setClickCountToStart(1);
@@ -32,7 +32,7 @@ class ServiceInstanceOperateEditor(
         row: Int,
         column: Int
     ): Component {
-        if (value == null || value !is NacosServiceInstancesResp.Host) {
+        if (value == null || value !is NacosServiceResp.Host) {
             return JPanel().apply { add(JLabel("Inoperable")) }
         }
         data = value
@@ -41,7 +41,7 @@ class ServiceInstanceOperateEditor(
             fireEditingStopped()
             //发送请求
             value.enabled = !value.enabled
-            if (!nacosClient.nsServiceInstances(value)) {
+            if (!nacosClient.updateInstance(value)) {
                 //通知
                 NotifyUtil.notify(project, "Nacos", "操作失败")
                 value.enabled = !value.enabled

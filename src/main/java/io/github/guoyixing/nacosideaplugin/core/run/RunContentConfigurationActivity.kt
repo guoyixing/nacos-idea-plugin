@@ -23,7 +23,7 @@ class RunContentConfigurationActivity(
         if (config == null) {
             return
         }
-        val configData = context.nacosClient.getConfig(config)
+        val configData = context.nacosClient.getConfigData(config)
         val type = config.type
         WriteAction.run<Throwable> {
             val normalizedConfigData = configData.replace("\r\n", "\n")
@@ -39,6 +39,6 @@ class RunContentConfigurationActivity(
     }
 
     fun getConfigs():List<NacosConfigsResp>{
-        return context.nacosClient.getConfigs()
+        return context.nacosClient.getConfigList()
     }
 }

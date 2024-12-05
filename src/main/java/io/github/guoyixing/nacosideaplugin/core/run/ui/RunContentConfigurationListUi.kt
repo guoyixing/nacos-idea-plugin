@@ -36,7 +36,7 @@ class RunContentConfigurationListUi(
 
     init {
         layout = BorderLayout()
-        val configs = context.nacosClient.getConfigs()
+        val configs = context.nacosClient.getConfigList()
 
         val jbList = JBList(configs)
         jbList.cellRenderer = ConfigurationListCellRenderer()

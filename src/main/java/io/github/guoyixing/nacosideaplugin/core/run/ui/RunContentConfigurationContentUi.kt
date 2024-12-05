@@ -43,7 +43,7 @@ class RunContentConfigurationContentUi(
             val selectConfiguration = context.selectConfiguration
             val configData = context.editor.document.text
             if (selectConfiguration != null) {
-                context.nacosClient.updateConfig(selectConfiguration, configData)
+                context.nacosClient.updateConfigData(selectConfiguration, configData)
                 NotifyUtil.notify(project, "Nacos", "保存成功")
             }
         }

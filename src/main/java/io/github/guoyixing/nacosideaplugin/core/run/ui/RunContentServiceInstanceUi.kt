@@ -23,10 +23,10 @@ class RunContentServiceInstanceUi(
 ) : JPanel() {
     init {
         layout = BorderLayout()
-        val serviceInstances = nacosClient.getServiceInstancesByApplication()
+        val serviceInstances = nacosClient.getServiceByDefaultConfig()
 
 
-        val hosts = nacosClient.nsCatalogInstancesByApplication(serviceInstances)
+        val hosts = nacosClient.getServiceInstanceList(serviceInstances)
 
         val data = Array(hosts.size) {
             arrayOf(
@@ -45,7 +45,7 @@ class RunContentServiceInstanceUi(
         jbTable.setShowColumns(true)
         jbTable.model = model
         jbTable.columnModel.getColumn(4).cellRenderer = ServiceInstanceCellRenderer()
-        jbTable.columnModel.getColumn(4).cellEditor = ServiceInstanceOperateEditor(project,nacosClient)
+        jbTable.columnModel.getColumn(4).cellEditor = ServiceInstanceOperateEditor(project, nacosClient)
 
         val scrollPane = JBScrollPane(jbTable)
         add(scrollPane, BorderLayout.CENTER)
@@ -60,10 +60,10 @@ class RunContentServiceInstanceUi(
 
     private fun refreshAction(jbTable: JBTable): ActionListener {
         return ActionListener {
-            val serviceInstances = nacosClient.getServiceInstancesByApplication()
+            val serviceInstances = nacosClient.getServiceByDefaultConfig()
 
 
-            val hosts = nacosClient.nsCatalogInstancesByApplication(serviceInstances)
+            val hosts = nacosClient.getServiceInstanceList(serviceInstances)
 
             val data = Array(hosts.size) {
                 arrayOf(

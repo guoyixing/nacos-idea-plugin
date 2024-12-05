@@ -1,6 +1,9 @@
 package io.github.guoyixing.nacosideaplugin.nacos
 
-import io.github.guoyixing.nacosideaplugin.nacos.config.model.*
+import io.github.guoyixing.nacosideaplugin.nacos.config.model.NacosConfigsResp
+import io.github.guoyixing.nacosideaplugin.nacos.config.model.NacosLoginResp
+import io.github.guoyixing.nacosideaplugin.nacos.config.model.NacosServiceResp
+import io.github.guoyixing.nacosideaplugin.nacos.config.model.configuration.NacosConfiguration
 import io.ktor.client.*
 import io.ktor.client.request.*
 import io.ktor.client.statement.*
@@ -8,33 +11,50 @@ import kotlinx.coroutines.runBlocking
 import kotlinx.serialization.json.Json
 
 /**
- * Nacos客户端
+ * Nacos客户端-接口
  *
- * @author 敲代码的旺财
- * @date 2024/11/24 21:51
+ * @author 郭一行
+ * @date 2024/12/5 13:23
  */
-class NacosClient(
-    private val nacosConfiguration: NacosConfiguration
-) {
+interface NacosClient {
 
-    private var accessToken: String? = null
+    /**
+     * nacos配置
+     */
+    val nacosConfiguration: NacosConfiguration
 
-    private var ttl: Long = 18000
+    /**
+     * token
+     */
+    var accessToken: String?
 
-    private var tokenGenerationTime: Long? = null
+    /**
+     * token生成时间
+     */
+    var tokenGenerationTime: Long?
 
-    private val json = Json {
-        ignoreUnknownKeys = true
-    }
+    /**
+     * token有效时间
+     */
+    var ttl: Long
 
-    private fun getAccessToken(): String {
-        if (accessToken == null || System.currentTimeMillis() - tokenGenerationTime!! > ttl) {
+    /**
+     * json解析
+     */
+    val json: Json
+
+    /**
+     * 获取token
+     */
+    fun fetchAccessToken(): String {
+        if (accessToken.isNullOrBlank() || System.currentTimeMillis() - tokenGenerationTime!! > ttl) {
+            val discovery = nacosConfiguration.spring.application.nacos.discovery
             runBlocking {
                 // 重新获取token
                 HttpClient().use { client ->
-                    val resp = client.post("http://${nacosConfiguration.discoveryServer}/nacos/v1/auth/login") {
-                        parameter("username", nacosConfiguration.userName)
-                        parameter("password", nacosConfiguration.password)
+                    val resp = client.post("http://${discovery.serverAddr}/nacos/v1/auth/login") {
+                        parameter("username", discovery.username)
+                        parameter("password", discovery.password)
                     }
 
                     json.decodeFromString<NacosLoginResp>(resp.bodyAsText()).let {
@@ -48,116 +68,13 @@ class NacosClient(
         return accessToken!!
     }
 
-    fun getConfigs(): List<NacosConfigsResp> {
+    fun updateInstance(host: NacosServiceResp.Host): Boolean {
+        val config = nacosConfiguration.spring.application.nacos.config
         return runBlocking {
             HttpClient().use { client ->
-                val resp = client.get("http://${nacosConfiguration.configServer}/nacos/v2/cs/history/configs") {
-                    parameter("namespaceId", nacosConfiguration.namespaceId)
-                    if (nacosConfiguration.auth) {
-                        parameter("accessToken", getAccessToken())
-                    }
-                }
-                val configsResp = json.decodeFromString<NacosBaseResp<List<NacosConfigsResp>>>(resp.bodyAsText())
-                configsResp.data.filter {
-                    it.dataId.startsWith(nacosConfiguration.configPrefix ?: nacosConfiguration.applicationName)
-                }
-
-            }
-        }
-    }
-
-    fun getConfig(config: NacosConfigsResp): String {
-        return runBlocking {
-            HttpClient().use { client ->
-                val resp = client.get("http://${nacosConfiguration.configServer}/nacos/v2/cs/config") {
-                    parameter("namespaceId", nacosConfiguration.namespaceId)
-                    parameter("dataId", config.dataId)
-                    parameter("group", config.group)
-                    if (nacosConfiguration.auth) {
-                        parameter("accessToken", getAccessToken())
-                    }
-                }
-                val configsResp = json.decodeFromString<NacosBaseResp<String>>(resp.bodyAsText())
-                configsResp.data
-            }
-        }
-    }
-
-    fun updateConfig(config: NacosConfigsResp, content: String): Boolean {
-        return runBlocking {
-            HttpClient().use { client ->
-                val resp = client.post("http://${nacosConfiguration.configServer}/nacos/v2/cs/config") {
-                    parameter("namespaceId", nacosConfiguration.namespaceId)
-                    parameter("dataId", config.dataId)
-                    parameter("group", config.group)
-                    parameter("content", content.replace("\n", "\r\n"))
-                    parameter("type", config.type)
-                    if (nacosConfiguration.auth) {
-                        parameter("accessToken", getAccessToken())
-                    }
-                }
-                val configsResp = json.decodeFromString<NacosBaseResp<Boolean>>(resp.bodyAsText())
-                configsResp.data
-            }
-        }
-    }
-
-    fun getServiceInstancesByApplication(): NacosServiceInstancesResp {
-        return runBlocking {
-            HttpClient().use { client ->
-                val resp = client.get("http://${nacosConfiguration.discoveryServer}/nacos/v2/ns/instance/list") {
-                    parameter("namespaceId", nacosConfiguration.namespaceId)
-                    parameter("serviceName", nacosConfiguration.applicationName)
-                    if (nacosConfiguration.auth) {
-                        parameter("accessToken", getAccessToken())
-                    }
-                }
-                val servicesResp = json.decodeFromString<NacosBaseResp<NacosServiceInstancesResp>>(resp.bodyAsText())
-                servicesResp.data.hosts.forEach {
-                    it.groupName = servicesResp.data.groupName
-                }
-
-                servicesResp.data
-            }
-        }
-    }
-
-    fun nsCatalogInstancesByApplication(service: NacosServiceInstancesResp): List<NacosServiceInstancesResp.Host> {
-        return runBlocking {
-            HttpClient().use { client ->
-                val resp = client.get("http://${nacosConfiguration.discoveryServer}/nacos/v1/ns/catalog/instances") {
-                    parameter("namespaceId", nacosConfiguration.namespaceId)
-                    parameter("serviceName", nacosConfiguration.applicationName)
-                    parameter("groupName", service.groupName)
-                    parameter("pageSize", 200)
-                    parameter("pageNo", 1)
-                    parameter("clusterName", service.clusters.isBlank().let { "DEFAULT" })
-                    if (nacosConfiguration.auth) {
-                        parameter("accessToken", getAccessToken())
-                    }
-                }
-                val bodyAsText = resp.bodyAsText()
-                println(bodyAsText)
-                if(bodyAsText.startsWith("{")){
-                    val servicesResp = json.decodeFromString<NacosServiceInstancesResp.Catalog>(bodyAsText)
-                    servicesResp.list.forEach {
-                        it.groupName = service.groupName
-                    }
-                    servicesResp.list
-                }else{
-                    emptyList()
-                }
-
-            }
-        }
-    }
-
-    fun nsServiceInstances(host: NacosServiceInstancesResp.Host): Boolean {
-        return runBlocking {
-            HttpClient().use { client ->
-                val resp = client.put("http://${nacosConfiguration.discoveryServer}/nacos/v1/ns/instance") {
-                    parameter("namespaceId", nacosConfiguration.namespaceId)
-                    parameter("serviceName", nacosConfiguration.applicationName)
+                val resp = client.put("http://${config.serverAddr}/nacos/v1/ns/instance") {
+                    parameter("namespaceId", config.namespace)
+                    parameter("serviceName", config.name)
                     parameter("ip", host.ip)
                     parameter("port", host.port)
                     parameter("clusterName", host.clusterName.isBlank().let { "DEFAULT" })
@@ -165,12 +82,70 @@ class NacosClient(
                     parameter("weight", host.weight)
                     parameter("enabled", host.enabled)
                     parameter("groupName", host.groupName)
-                    if (nacosConfiguration.auth) {
-                        parameter("accessToken", getAccessToken())
+                    if (!config.username.isNullOrBlank() && !config.password.isNullOrBlank()) {
+                        parameter("accessToken", fetchAccessToken())
                     }
                 }
                 resp.bodyAsText() == "ok"
             }
         }
     }
+
+    fun getServiceInstanceList(service: NacosServiceResp): List<NacosServiceResp.Host> {
+        val discovery = nacosConfiguration.spring.application.nacos.discovery
+        return runBlocking {
+            HttpClient().use { client ->
+                val resp = client.get("http://${discovery.serverAddr}/nacos/v1/ns/catalog/instances") {
+                    parameter("namespaceId", discovery.namespace)
+                    parameter("serviceName", discovery.service)
+                    parameter("groupName", service.groupName)
+                    parameter("pageSize", 200)
+                    parameter("pageNo", 1)
+                    parameter("clusterName", service.clusters.isBlank().let { "DEFAULT" })
+                    if (!discovery.username.isNullOrBlank() && !discovery.password.isNullOrBlank()) {
+                        parameter("accessToken", fetchAccessToken())
+                    }
+                }
+
+                val respBody = resp.bodyAsText()
+                if (respBody.startsWith("{")) {
+                    val servicesResp = json.decodeFromString<NacosServiceResp.InstanceList>(respBody)
+                    servicesResp.list.forEach {
+                        it.groupName = service.groupName
+                    }
+                    servicesResp.list
+                } else {
+                    emptyList()
+                }
+
+            }
+        }
+    }
+
+    /**
+     * 获取配置列表
+     * @return 配置列表
+     */
+    fun getConfigList(): List<NacosConfigsResp>
+
+    /**
+     * 获取配置数据
+     * @param config 配置
+     * @return 配置数据
+     */
+    fun getConfigData(config: NacosConfigsResp): String
+
+    /**
+     * 更新配置数据
+     * @param config 配置
+     * @param content 配置数据
+     * @return 是否更新成功
+     */
+    fun updateConfigData(config: NacosConfigsResp, content: String): Boolean
+
+    /**
+     * 获取服务信息
+     * @return 服务信息
+     */
+    fun getServiceByDefaultConfig(): NacosServiceResp
 }

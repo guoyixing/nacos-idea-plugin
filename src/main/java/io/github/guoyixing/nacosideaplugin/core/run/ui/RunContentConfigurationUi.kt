@@ -21,13 +21,13 @@ import javax.swing.JPanel
 class RunContentConfigurationUi(
     private val project: Project,
     nacosClient: NacosClient
-) :JPanel() {
+) : JPanel() {
 
-    private val editor:Editor = createEditorFromContent()
+    private val editor: Editor = createEditorFromContent()
 
     private val context: RunContentConfigurationContext = RunContentConfigurationContext(
-        editor=editor,
-        nacosClient=nacosClient
+        editor = editor,
+        nacosClient = nacosClient
     )
 
     private val activity: RunContentConfigurationActivity = RunContentConfigurationActivity(project, context)
@@ -36,8 +36,8 @@ class RunContentConfigurationUi(
         layout = BorderLayout()
 
         val onePixelSplitter = OnePixelSplitter(false, 0.2f)
-        onePixelSplitter.firstComponent = RunContentConfigurationListUi(project,context,activity)
-        onePixelSplitter.secondComponent = RunContentConfigurationContentUi(project,context,activity)
+        onePixelSplitter.firstComponent = RunContentConfigurationListUi(project, context, activity)
+        onePixelSplitter.secondComponent = RunContentConfigurationContentUi(project, context, activity)
 
         add(onePixelSplitter, BorderLayout.CENTER)
     }

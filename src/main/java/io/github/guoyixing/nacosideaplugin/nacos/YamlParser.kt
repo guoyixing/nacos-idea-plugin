@@ -1,9 +1,11 @@
 package io.github.guoyixing.nacosideaplugin.nacos
 
+import com.fasterxml.jackson.databind.ObjectMapper
 import com.intellij.openapi.editor.Document
-import io.github.guoyixing.nacosideaplugin.nacos.config.model.NacosConfiguration
+import io.github.guoyixing.nacosideaplugin.nacos.config.model.configuration.NacosConfiguration
+import org.yaml.snakeyaml.LoaderOptions
 import org.yaml.snakeyaml.Yaml
-
+import org.yaml.snakeyaml.constructor.Constructor
 /**
  * 用来解析Yaml文件
  *
@@ -12,32 +14,23 @@ import org.yaml.snakeyaml.Yaml
  */
 class YamlParser {
 
-    private val parser = Yaml()
+    private val parser = Yaml(Constructor(NacosConfiguration::class.java, LoaderOptions()));
 
     fun parser(yaml: Document): NacosConfiguration {
-        val bootstrap = parser.load<Map<String, Any>>(yaml.text)
-        val spring = bootstrap["spring"] as Map<*, *>
+        val configuration = parser.load<NacosConfiguration>(yaml.text)
 
-        val application = spring["application"] as Map<*, *>
-        val applicationName = application["name"] as String
+        val discovery = configuration.spring.application.nacos.discovery
+        discovery.namespace.isBlank().let { discovery.namespace = "public" }
+        discovery.ipType.isBlank().let { discovery.ipType = "IPv4" }
+        discovery.clusterName.isBlank().let { discovery.clusterName = "DEFAULT" }
+        discovery.service.isNullOrBlank().let { discovery.service = configuration.spring.application.name }
 
-        val cloud = spring["cloud"] as Map<*, *>
-        val nacos = cloud["nacos"] as Map<*, *>
-        val discovery = nacos["discovery"] as Map<*, *>
-        val discoveryServerAdd= discovery["server-addr"] as String
-
-        val config = nacos["config"] as Map<*, *>
-        val configServerAdd = config["server-addr"] as String
-//        val configExtensionConfigs = config["extension-configs"]
-//        if (configExtensionConfigs != null){
-//            val extensionConfigs = configExtensionConfigs as List<String>
-//        }
-
-        return NacosConfiguration(
-            applicationName = applicationName,
-            discoveryServer = discoveryServerAdd,
-            configServer = configServerAdd
-        )
+        val config = configuration.spring.application.nacos.config
+        config.namespace.isBlank().let { config.namespace = "public" }
+        config.group.isBlank().let { config.group = "DEFAULT_GROUP" }
+        config.fileExtension.isBlank().let { config.fileExtension = "properties" }
+        config.name.isNullOrBlank().let { config.name = configuration.spring.application.name }
+        return configuration
     }
 
 }
