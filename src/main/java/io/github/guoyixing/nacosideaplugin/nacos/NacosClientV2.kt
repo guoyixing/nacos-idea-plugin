@@ -31,7 +31,7 @@ class NacosClientV2(
     }
 
     override fun getConfigList(): List<NacosConfigsResp> {
-        val config = nacosConfiguration.spring.application.nacos.config
+        val config = nacosConfiguration.spring.cloud.nacos.config
         return runBlocking {
             HttpClient().use { client ->
                 val resp = client.get("http://${config.serverAddr}/nacos/v2/cs/history/configs") {
@@ -51,13 +51,13 @@ class NacosClientV2(
                             || config.sharedDataids?.contains(it.dataId) == true
                             || config.refreshableDataids?.contains(it.dataId) == true
                 }
-
+                configsResp.data
             }
         }
     }
 
     override fun getConfigData(config: NacosConfigsResp): String {
-        val nacosConfig = nacosConfiguration.spring.application.nacos.config
+        val nacosConfig = nacosConfiguration.spring.cloud.nacos.config
         return runBlocking {
             HttpClient().use { client ->
                 val resp = client.get("http://${nacosConfig.serverAddr}/nacos/v2/cs/config") {
@@ -75,7 +75,7 @@ class NacosClientV2(
     }
 
     override fun updateConfigData(config: NacosConfigsResp, content: String): Boolean {
-        val nacosConfig = nacosConfiguration.spring.application.nacos.config
+        val nacosConfig = nacosConfiguration.spring.cloud.nacos.config
         return runBlocking {
             HttpClient().use { client ->
                 val resp = client.post("http://${nacosConfig.serverAddr}/nacos/v2/cs/config") {
@@ -95,7 +95,7 @@ class NacosClientV2(
     }
 
     override fun getServiceByDefaultConfig(): NacosServiceResp {
-        val config = nacosConfiguration.spring.application.nacos.config
+        val config = nacosConfiguration.spring.cloud.nacos.config
         return runBlocking {
             HttpClient().use { client ->
                 val resp = client.get("http://${config.serverAddr}/nacos/v2/ns/instance/list") {

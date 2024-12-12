@@ -48,7 +48,7 @@ interface NacosClient {
      */
     fun fetchAccessToken(): String {
         if (accessToken.isNullOrBlank() || System.currentTimeMillis() - tokenGenerationTime!! > ttl) {
-            val discovery = nacosConfiguration.spring.application.nacos.discovery
+            val discovery = nacosConfiguration.spring.cloud.nacos.discovery
             runBlocking {
                 // 重新获取token
                 HttpClient().use { client ->
@@ -69,7 +69,7 @@ interface NacosClient {
     }
 
     fun updateInstance(host: NacosServiceResp.Host): Boolean {
-        val config = nacosConfiguration.spring.application.nacos.config
+        val config = nacosConfiguration.spring.cloud.nacos.config
         return runBlocking {
             HttpClient().use { client ->
                 val resp = client.put("http://${config.serverAddr}/nacos/v1/ns/instance") {
@@ -92,7 +92,7 @@ interface NacosClient {
     }
 
     fun getServiceInstanceList(service: NacosServiceResp): List<NacosServiceResp.Host> {
-        val discovery = nacosConfiguration.spring.application.nacos.discovery
+        val discovery = nacosConfiguration.spring.cloud.nacos.discovery
         return runBlocking {
             HttpClient().use { client ->
                 val resp = client.get("http://${discovery.serverAddr}/nacos/v1/ns/catalog/instances") {

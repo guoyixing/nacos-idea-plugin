@@ -6,14 +6,8 @@ package io.github.guoyixing.nacosideaplugin.nacos.config.model.configuration
  * @author 郭一行
  * @date 2024/12/2 13:13
  */
-class NacosConfiguration1 {
-    private var _spring: Spring = Spring()
-
-    var spring: Spring
-        get() = _spring
-        set(varue) {
-            _spring = varue
-        }
+class NacosConfiguration {
+    var spring: Spring = Spring()
 
 
     class Discovery {
@@ -191,15 +185,22 @@ class NacosConfiguration1 {
         var dataId: String = ""
         var group: String = ""
         var refresh: Boolean = false
+
+        constructor()
     }
 
     class Spring {
         var application: Application = Application()
+        var cloud: Cloud = Cloud()
+    }
+
+    class Cloud {
+        var nacos: Nacos = Nacos()
     }
 
     class Application {
         var name: String = ""
-        var nacos: Nacos = Nacos()
+
     }
 
     class Nacos {
