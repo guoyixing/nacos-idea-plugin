@@ -51,7 +51,6 @@ class NacosClientV2(
                             || config.sharedDataids?.contains(it.dataId) == true
                             || config.refreshableDataids?.contains(it.dataId) == true
                 }
-                configsResp.data
             }
         }
     }

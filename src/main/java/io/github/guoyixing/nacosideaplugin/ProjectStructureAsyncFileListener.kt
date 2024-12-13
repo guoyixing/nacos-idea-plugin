@@ -33,7 +33,7 @@ class ProjectStructureAsyncFileListener(
                         it.file?.let { file ->
                             runReadAction {
                                 FileDocumentManager.getInstance().getDocument(file)?.let {
-                                    val nacosConfiguration = yamlParser.parser(it)
+                                    val nacosConfiguration = yamlParser.parser(it,projectStructure.project,moduleName)
                                     projectStructure.moduleBootstrap[moduleName] = nacosConfiguration
                                 }
                             }

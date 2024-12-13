@@ -20,6 +20,7 @@ object ProjectStructureManager {
 
     fun init(project: Project) {
         ProjectStructure(
+            project = project,
             mavenProjectsManager = MavenProjectsManager.getInstance(project)
         ).let {
             projects[project] = it
@@ -41,7 +42,16 @@ object ProjectStructureManager {
      */
     fun getMavenModules(project: Project) {
         MavenProjectsManager.getInstance(project).projects.forEach {
-            val pathIndex = it.file.path.indexOfLast { it == '/' }
+            for (dependency in it.dependencies) {
+                if(dependency.groupId == "com.alibaba.nacos") {
+                    projects[project]!!.moduleNacosVersion[it.displayName] = dependency.version
+                    break
+                }else if (dependency.groupId == "com.alibaba.cloud" && dependency.artifactId.startsWith("spring-cloud-starter-alibaba-nacos", true)) {
+                    projects[project]!!.moduleNacosVersion[it.displayName] = dependency.version
+                    break
+                }
+            }
+            val pathIndex = it.file.path.indexOfLast { path -> path == '/' }
             val modulePath = it.file.path.substring(0, pathIndex)
             projects[project]!!.modulePaths[it.displayName] = modulePath
         }
@@ -66,7 +76,7 @@ object ProjectStructureManager {
                 runReadAction {
                     val document = FileDocumentManager.getInstance().getDocument(virtualFile)
                     document?.let {
-                        val nacosConfiguration = yamlParser.parser(document)
+                        val nacosConfiguration = yamlParser.parser(document,project,moduleName)
                         projects[project]!!.moduleBootstrap[moduleName] = nacosConfiguration
                     }
                 }
